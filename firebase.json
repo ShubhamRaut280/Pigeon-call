@@ -1,8 +1,8 @@
 {
   "hosting": {
-    "site": "guardandroid-videocallapp",
+    "site": "pigeon-calling",
     "public": "dist",
-    "site": "guardappvideocall",
+    "site": "videocall",
     "ignore": [
       "firebase.json",
       "**/.*",

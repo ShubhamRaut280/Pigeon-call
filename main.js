@@ -5,9 +5,6 @@ import 'firebase/firestore';
 import "firebase/database";
 
 
-import { initializeApp } from "firebase/app";
-import { getAnalytics } from "firebase/analytics";
-
 
 const firebaseConfig = {
   apiKey: "AIzaSyA5DuOXQlt0K63iw4h23wFYOWdMgKOE2I4",
@@ -20,9 +17,7 @@ const firebaseConfig = {
   measurementId: "G-NKRKYMC1VX"
 };
 
-// Initialize Firebase
-const app = initializeApp(firebaseConfig);
-const analytics = getAnalytics(app);
+
 
 if (!firebase.apps.length) {
   firebase.initializeApp(firebaseConfig);
@@ -85,7 +80,7 @@ var receiver = Android.getReceiverId();
 
 
 
-// Android.showToast("Data received:  guard : " + guard + " connection id : " + connId)
+Android.showToast("Data received:  sender : " + sender + " connection id : " + connId + "receiver : "+receiver)
 
 
 startCam(connId, sender, receiver)
@@ -140,7 +135,7 @@ async function createOffer(senderId, receiverId) {
   const answerCandidates = callDoc.collection('answerCandidates');
 
 
-  // Android.showToast("Offer created here is connection id : " + callDoc.id)
+  Android.showToast("Offer created here is connection id : " + callDoc.id)
 
 
   // Get candidates for caller, save to db
@@ -161,17 +156,22 @@ async function createOffer(senderId, receiverId) {
 
   const database = firebase.database();
 
- 
+  Android.showToast("Adding reqeuest to db")
+
+
   // Store connection ID in Realtime Database
   database.ref('callRequests/' + receiverId).update({
     callAccepted: false,
     callRejected: false,
     connectionId: callDoc.id,
-    sender:userId,
+    sender:senderId,
     isHangout: false,
     timestamp:getCurrentDateandTime(),
 
   })
+
+  Android.showToast("Request added")
+
   
 
 
@@ -198,14 +198,13 @@ async function createOffer(senderId, receiverId) {
     });
   });
 
-  hangupButton.disabled = false;
 
 }
 
 // 3. Answer the call with the unique ID
 async function answerCall(connId, senderId, receiverId) {
   const callId = connId;
-  // Android.showToast("connection id from js : " + connId)
+  Android.showToast("connection id from js : " + connId)
   const callDoc = firestore.collection('calls').doc(callId);
   const answerCandidates = callDoc.collection('answerCandidates');
   const offerCandidates = callDoc.collection('offerCandidates');
