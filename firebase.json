@@ -1,0 +1,12 @@
+{
+  "hosting": {
+    "site": "guardandroid-videocallapp",
+    "public": "dist",
+    "site": "guardappvideocall",
+    "ignore": [
+      "firebase.json",
+      "**/.*",
+      "**/node_modules/**"
+    ]
+  }
+}

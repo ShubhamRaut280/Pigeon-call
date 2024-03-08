@@ -1,0 +1,147 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <link rel="icon" type="image/svg+xml" href="favicon.svg" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>WebRTC Demo</title>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Syne+Mono&display=swap');
+
+    html, body {
+      padding: 0;
+      margin: 0;
+      height: 100%; 
+    }
+
+    .primary-video {
+      position: absolute;
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+
+    .secondary-video {
+      position: absolute;
+      max-width: 30%;
+      width: 30%;
+      margin: 16px;
+      border-radius: 16px;
+    }
+
+    .button-container {
+      position: fixed;
+      bottom: 20px;
+      left: 50%;
+      transform: translateX(-50%);
+      display: flex;
+      gap: 10px;
+    }
+
+    .control-button {
+      background-color: transparent; 
+      color: #fff; 
+      padding: 10px;
+      font-size: 12px;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+      display: flex;
+      align-items: center; 
+      justify-content: center; 
+    }
+
+    .control-button:disabled {
+      background-color: transparent;
+      cursor: not-allowed;
+    }
+
+    /* Adjust the size of images */
+    .control-button img {
+      width: 50px; 
+      height: 50px; 
+      margin-right: 5px; 
+    }
+
+    /* Circular progress bar */
+    .progress-container {
+      position: absolute;
+      width: 100%;
+      height: 100%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background-color: rgba(0, 0, 0, 0.5);
+      border-radius: 50%;
+      transition: opacity 0.3s ease;
+    }
+
+    .progress {
+      border: 4px solid #f3f3f3;
+      border-radius: 50%;
+      border-top: 4px solid #3498db;
+      width: 50px;
+      height: 50px;
+      animation: spin 2s linear infinite;
+    }
+
+    @keyframes spin {
+      0% { transform: rotate(0deg); }
+      100% { transform: rotate(360deg); }
+    }
+
+    .progress-hidden {
+      opacity: 0;
+      pointer-events: none;
+    }
+
+  
+
+.progress-container {
+  display: none;
+  background-color: transparent;
+}
+
+.progress {
+  border: 4px solid transparent; /* Remove the border */
+  border-top: 4px solid #3498db;
+  width: 50px;
+  height: 50px;
+  animation: spin 700ms linear infinite;
+}
+
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); 
+  }
+}
+
+.progress-hidden {
+  opacity: 0;
+  pointer-events: none;
+}
+
+  </style>
+</head>
+<body>
+  <div class="video-container">
+    <video class="primary-video" autoplay id="remoteVideo" hidden></video>
+    <video class="secondary-video" autoplay muted id="webcamVideo"></video>
+    <div class="progress-container" id="progressContainer">
+      <div class="progress"></div>
+    </div>
+    <div class="button-container">
+      <button class="control-button" id="swapCameraButton">
+        <img src="./icons/switchcamera.png" alt="Swap Camera">
+      </button>
+      <button class="control-button" id="hangupButton">
+        <img src="./icons/phone-call-end.png" alt="Hangup">
+      </button>
+      <button class="control-button" id="muteMicButton">
+        <img src="./icons/unmuted.png" alt="Mute Mic">
+      </button>
+    </div>
+  </div>
+  <script type="module" src="/main.js"></script>
+</body>
+</html>
