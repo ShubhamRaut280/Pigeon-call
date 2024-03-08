@@ -5,18 +5,24 @@ import 'firebase/firestore';
 import "firebase/database";
 
 
+import { initializeApp } from "firebase/app";
+import { getAnalytics } from "firebase/analytics";
+
 
 const firebaseConfig = {
-  apiKey: "AIzaSyC3_rIqvsRXfM8fCYLbWezysrqI0Ks-Nx4",
-  authDomain: "security-mechanics.firebaseapp.com",
-  databaseURL: "https://security-mechanics-default-rtdb.asia-southeast1.firebasedatabase.app",
-  projectId: "security-mechanics",
-  storageBucket: "security-mechanics.appspot.com",
-  messagingSenderId: "1080705073726",
-  appId: "1:1080705073726:web:d0f125c014e29923c4476f",
-  measurementId: "G-Z0N48WWYSR"
+  apiKey: "AIzaSyA5DuOXQlt0K63iw4h23wFYOWdMgKOE2I4",
+  authDomain: "pigeon-98944.firebaseapp.com",
+  databaseURL: "https://pigeon-98944-default-rtdb.asia-southeast1.firebasedatabase.app",
+  projectId: "pigeon-98944",
+  storageBucket: "pigeon-98944.appspot.com",
+  messagingSenderId: "916654692678",
+  appId: "1:916654692678:web:578179ab126c1b11f82d47",
+  measurementId: "G-NKRKYMC1VX"
 };
 
+// Initialize Firebase
+const app = initializeApp(firebaseConfig);
+const analytics = getAnalytics(app);
 
 if (!firebase.apps.length) {
   firebase.initializeApp(firebaseConfig);
@@ -73,7 +79,8 @@ setTimeout(() => {
 // 1. Setup media sources
 
 var connId = Android.getConnId();
-var guard = Android.getUserUid();
+var sender = Android.getSenderId();
+var receiver = Android.getReceiverId();
 
 
 
@@ -81,10 +88,10 @@ var guard = Android.getUserUid();
 // Android.showToast("Data received:  guard : " + guard + " connection id : " + connId)
 
 
-startCam(connId, guard)
+startCam(connId, sender, receiver)
 
 
-async function startCam(connId, guard) {
+async function startCam(connId, senderId, receiverId) {
   let constraints = {
     video: { facingMode: 'user' }, // Select front camera
     audio: true
@@ -110,9 +117,9 @@ async function startCam(connId, guard) {
   remoteVideo.srcObject = remoteStream;
 
   if (connId === null || connId === undefined || connId === "") {
-    createOffer(guard);
+    createOffer(senderId, receiverId);
   } else {
-    answerCall(connId, guard);
+    answerCall(connId, senderId, receiverId);
   }
 }
 
@@ -124,7 +131,7 @@ muteMicButton.addEventListener('click', toggleMuteMic);
 
 
 // 2. Create an offer
-async function createOffer(userId) {
+async function createOffer(senderId, receiverId) {
 
 
   // Reference Firestore collections for signaling
@@ -154,39 +161,19 @@ async function createOffer(userId) {
 
   const database = firebase.database();
 
-  // getUser name 
-const callDocRef = firestore.collection("employees").doc(userId);
-
-callDocRef.get().then((doc) => {
-  if (doc.exists) {
-    const name = doc.data().name;
-
-    // Android.showToast("got name :"+ name+userId+ "time"+ getCurrentDateandTime())
-
+ 
   // Store connection ID in Realtime Database
-  database.ref('callRequestFromGuard/' + userId).update({
+  database.ref('callRequests/' + receiverId).update({
     callAccepted: false,
     callRejected: false,
     connectionId: callDoc.id,
-    employeeId:userId,
+    sender:userId,
     isHangout: false,
-    metadata:{
-      name: name,
-    },
-    receiverId:"",
-    rejectedBy:"",
-    rejectedByName:"",
     timestamp:getCurrentDateandTime(),
-    updatedAt:getCurrentDateandTime()
 
   })
+  
 
-  } else {
-    Android.showToast("Guard name not found in database");
-  }
-}).catch((error) => {
-  console.error("Error getting document:", error);
-});
 
 
 
@@ -212,11 +199,11 @@ callDocRef.get().then((doc) => {
   });
 
   hangupButton.disabled = false;
-};
 
+}
 
 // 3. Answer the call with the unique ID
-async function answerCall(connId, guardId) {
+async function answerCall(connId, senderId, receiverId) {
   const callId = connId;
   // Android.showToast("connection id from js : " + connId)
   const callDoc = firestore.collection('calls').doc(callId);
@@ -259,7 +246,7 @@ async function answerCall(connId, guardId) {
   
   const database = firebase.database();
 // update accepted status
-database.ref('callRequestsFromSupervisor/' + guardId).update({
+database.ref('callRequests/' + receiverId).update({
   callAccepted: true,
 });
 };
@@ -275,14 +262,12 @@ function hangup() {
   const database = firebase.database();
 
 
-  database.ref('callRequestFromGuard/' + guard).update({
+  database.ref('callRequests/' + receiver).update({
     isHangout: true,
-    updatedAt: getCurrentDateandTime()
   });
 
-  database.ref('callRequestsFromSupervisor/' + guard).update({
+  database.ref('callRequests/' + receiver).update({
     isHangout: true,
-    updatedAt: getCurrentDateandTime()
   });
 
 
